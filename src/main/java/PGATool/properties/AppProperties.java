@@ -5,6 +5,7 @@ public final class AppProperties {
 	private static AppProperties APP_PROPERTIES;
 	private String dbPropertiesFilePath;
 	private String tablesPropertiesFilePath;
+	private String backupFilesPath;
 
 	private AppProperties() {
 
@@ -43,6 +44,20 @@ public final class AppProperties {
 	 */
 	public void setTablesPropertiesFilePath(String tablesPropertiesFilePath) {
 		this.tablesPropertiesFilePath = tablesPropertiesFilePath;
+	}
+
+	/**
+	 * @return the backupFilesPath
+	 */
+	public String getBackupFilesPath() {
+		return backupFilesPath;
+	}
+
+	/**
+	 * @param backupFilesPath the backupFilesPath to set
+	 */
+	public void setBackupFilesPath(String backupFilesPath) {
+		this.backupFilesPath = backupFilesPath;
 	}
 
 }

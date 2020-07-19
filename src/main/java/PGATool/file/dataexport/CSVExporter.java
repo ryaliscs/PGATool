@@ -1,4 +1,4 @@
-package PGATool.file;
+package PGATool.file.dataexport;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import PGATool.connection.DBConnection;
+import PGATool.file.PGAFileHelper;
 
 public class CSVExporter {
 	
