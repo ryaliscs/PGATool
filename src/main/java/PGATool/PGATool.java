@@ -49,7 +49,7 @@ public class PGATool {
 		}
 	}
 
-	private void importDATA() throws IOException {
+	private void importDATA() throws IOException, URISyntaxException {
 		PGTableImporter importer = new PGTableImporter();
 		importer.importData();
 	}
