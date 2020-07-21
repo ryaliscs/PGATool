@@ -28,11 +28,12 @@ public class CSVReader {
 
 	private void updateDataBase(String tableName, List<String> insertStatements) throws SQLException, IOException {
 		DBConnection dbcon = new DBConnection();
+		System.out.println("Inserting into " + tableName + ":");
 		try (Connection conn = dbcon.connect(); Statement stmt = conn.createStatement();) {
-			for(String insertStatement : insertStatements) {
+			for (String insertStatement : insertStatements) {
+				System.out.println(insertStatement);
 				stmt.execute(insertStatement);
 			}
-
 		}
 	}
 
@@ -41,7 +42,6 @@ public class CSVReader {
 		Map<String, String> metaData = getMetaData(tableName);
 
 		List<String> readLines = Files.readLines(new File(path.toUri()), Charset.defaultCharset());
-		readLines.stream().forEach(System.out::println);
 		String header = readLines.get(0);
 		String[] headerColumns = header.split(",");
 
@@ -68,15 +68,31 @@ public class CSVReader {
 		switch (metaData.get(headerColumn)) {
 		case "int8":
 		case "int4":
-			result = value;
+			result = resolveNull(value);
 			break;
 		case "varchar":
-			result = "'" + value + "'";
+		case "text":
+			result = resolveStringNull(value);
+			break;
+		case "timestamp":
+			result = "'" + resolveNull(value)+ "'";
+			break;
+		case "bool":
+			result = resolveStringNull(value);
 			break;
 		default:
-			assert false : "cannot find right type";
+			System.out.println(metaData.toString());
+			assert true : "cannot find right type";
 		}
 		return result;
+	}
+
+	private String resolveStringNull(String value) {
+		return value != null && !value.equals("null") ? "'" +value+ "'" : null;
+	}
+
+	private String resolveNull(String value) {
+		return value != null ? value : null;
 	}
 
 	private Map<String, String> getMetaData(String tableName) throws SQLException, IOException {
@@ -91,5 +107,12 @@ public class CSVReader {
 			}
 		}
 		return mapColumnType;
+	}
+
+	public void cleanup(String tableName) throws SQLException, IOException {
+		DBConnection dbcon = new DBConnection();
+		try (Connection conn = dbcon.connect(); Statement stmt = conn.createStatement();) {
+			stmt.execute("delete from " + tableName);
+		}
 	}
 }

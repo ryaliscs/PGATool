@@ -16,32 +16,33 @@ import PGATool.properties.AppProperties;
 import PGATool.properties.PGAProperties;
 
 public class PGTableImporter {
-	
-	public void importData() throws IOException, URISyntaxException, SQLException
-	{
+
+	public void importData() throws IOException, URISyntaxException, SQLException {
 		Map<String, Path> filePathsFromBackupSource = getFilePathsFromBackupSource();
-		
-		for (String table : PGAProperties.getTables()) {
-			CSVReader reader = new CSVReader();
+		CSVReader reader = new CSVReader();
+
+		List<String> tables = PGAProperties.getTables();
+		for (int i = tables.size() - 1; i >= 0; i--) {
+			reader.cleanup(tables.get(i));
+		}
+
+		for (String table : tables) {
 			reader.readCSVFile(table, filePathsFromBackupSource.get(table));
 		}
 	}
 
-	
-
-
 	private Map<String, Path> getFilePathsFromBackupSource() throws IOException {
-		 List<Path> listFiles = new ArrayList<>();
-		 Files.newDirectoryStream(Paths.get(AppProperties.getInstance().getBackupFilesPath()))
-			        .forEach(path -> listFiles.add(path));
-		 Map<String, Path> mapFilePath = new HashMap<>(listFiles.size());
-		 for(Path path : listFiles) {
-			 String filePath = path.toString();
-			 int si = filePath.lastIndexOf("\\");
-			 int li = filePath.indexOf(".");
-			 String fileName = filePath.substring(si+1, li);
-			 mapFilePath.put(fileName, path);
-		 }
-		 return Collections.unmodifiableMap(mapFilePath);
+		List<Path> listFiles = new ArrayList<>();
+		Files.newDirectoryStream(Paths.get(AppProperties.getInstance().getBackupFilesPath()))
+				.forEach(path -> listFiles.add(path));
+		Map<String, Path> mapFilePath = new HashMap<>(listFiles.size());
+		for (Path path : listFiles) {
+			String filePath = path.toString();
+			int si = filePath.lastIndexOf("\\");
+			int li = filePath.indexOf(".");
+			String fileName = filePath.substring(si + 1, li);
+			mapFilePath.put(fileName, path);
+		}
+		return Collections.unmodifiableMap(mapFilePath);
 	}
 }
