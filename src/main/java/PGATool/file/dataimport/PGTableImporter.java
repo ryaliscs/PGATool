@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,7 +17,7 @@ import PGATool.properties.PGAProperties;
 
 public class PGTableImporter {
 	
-	public void importData() throws IOException, URISyntaxException
+	public void importData() throws IOException, URISyntaxException, SQLException
 	{
 		Map<String, Path> filePathsFromBackupSource = getFilePathsFromBackupSource();
 		
