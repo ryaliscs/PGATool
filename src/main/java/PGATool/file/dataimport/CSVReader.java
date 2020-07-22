@@ -75,7 +75,7 @@ public class CSVReader {
 			result = resolveStringNull(value);
 			break;
 		case "timestamp":
-			result = "'" + resolveNull(value)+ "'";
+			result =  resolveStringNull(value);
 			break;
 		case "bool":
 			result = resolveStringNull(value);
