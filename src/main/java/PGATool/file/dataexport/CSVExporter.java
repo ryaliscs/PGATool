@@ -15,7 +15,7 @@ import PGATool.connection.DBConnection;
 import PGATool.file.PGAFileHelper;
 
 public class CSVExporter {
-	
+
 	public void writeToFile(String tableName) throws IOException {
 		String tableBackupPath = getExportFilePath(tableName);
 		Path path = Files.createFile(Paths.get(tableBackupPath));
@@ -23,6 +23,7 @@ public class CSVExporter {
 		// Writing data here
 		byte[] buf = getDataFromTable(tableName).getBytes();
 		Files.write(path, buf);
+		System.out.println("Export data of: "+tableName);
 	}
 
 	private String getExportFilePath(String tableName) {
@@ -31,7 +32,6 @@ public class CSVExporter {
 		PGAFileHelper.deleteFileIfExits(tableBackupPath);
 		return tableBackupPath;
 	}
-
 
 	private String getDataFromTable(String tableName) throws IOException {
 		DBConnection con = new DBConnection();
@@ -51,15 +51,20 @@ public class CSVExporter {
 	private void addData(StringBuilder sb, ResultSet rs) throws SQLException {
 		ResultSetMetaData metaData = rs.getMetaData();
 		while (rs.next()) {
-			for (int i = 1; i <= metaData.getColumnCount(); i++) {
-				sb.append(rs.getString(i));
-				if (i != metaData.getColumnCount()) {
+			int columnCount = metaData.getColumnCount();
+			for (int i = 1; i <= columnCount; i++) {
+				String columnLabel = metaData.getColumnLabel(i);
+				String value = PGAFileHelper.replaceTheDelimeterInValue(rs.getString(columnLabel));
+				//System.out.println(columnLabel + "-" + value);
+				sb.append(value);
+				if (i != columnCount) {
 					sb.append(",");
 				}
 			}
 			sb.append("\n");
 		}
 	}
+
 
 	private void prepareHeader(StringBuilder sb, ResultSetMetaData metaData) throws SQLException {
 		sb.append(metaData.getColumnName(1));

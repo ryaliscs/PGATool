@@ -17,6 +17,7 @@ import java.util.Map;
 import com.google.common.io.Files;
 
 import PGATool.connection.DBConnection;
+import PGATool.file.PGAFileHelper;
 
 public class CSVReader {
 
@@ -28,10 +29,10 @@ public class CSVReader {
 
 	private void updateDataBase(String tableName, List<String> insertStatements) throws SQLException, IOException {
 		DBConnection dbcon = new DBConnection();
-		System.out.println("Inserting into " + tableName + ":");
+		System.out.println("Inserting into :" + tableName);
 		try (Connection conn = dbcon.connect(); Statement stmt = conn.createStatement();) {
 			for (String insertStatement : insertStatements) {
-				System.out.println(insertStatement);
+//				System.out.println(insertStatement);
 				stmt.execute(insertStatement);
 			}
 		}
@@ -42,23 +43,25 @@ public class CSVReader {
 		Map<String, String> metaData = getMetaData(tableName);
 
 		List<String> readLines = Files.readLines(new File(path.toUri()), Charset.defaultCharset());
-		String header = readLines.get(0);
-		String[] headerColumns = header.split(",");
+		if (readLines.size() > 0) {
+			String header = readLines.get(0);
+			String[] headerColumns = header.split(",");
 
-		for (int i = 1; i < readLines.size(); i++) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("INSERT INTO " + tableName);
-			sb.append("(").append(header).append(")");
-			sb.append("VALUES (");
-			String[] values = readLines.get(i).split(",");
-			String v = getActualValue(values[0], headerColumns[0], metaData);
-			for (int j = 1; j < values.length; j++) {
-				v = v + ",";
-				v = v + getActualValue(values[j], headerColumns[j], metaData);
+			for (int i = 1; i < readLines.size(); i++) {
+				StringBuilder sb = new StringBuilder();
+				sb.append("INSERT INTO " + tableName);
+				sb.append("(").append(header).append(")");
+				sb.append("VALUES (");
+				String[] values = readLines.get(i).split(",");
+				String v = getActualValue(values[0], headerColumns[0], metaData);
+				for (int j = 1; j < values.length; j++) {
+					v = v + ",";
+					v = v + getActualValue(values[j], headerColumns[j], metaData);
+				}
+				v = v + ")";
+				sb.append(v);
+				insertStatements.add(sb.toString());
 			}
-			v = v + ")";
-			sb.append(v);
-			insertStatements.add(sb.toString());
 		}
 		return insertStatements;
 	}
@@ -72,10 +75,11 @@ public class CSVReader {
 			break;
 		case "varchar":
 		case "text":
+		case "bytea":
 			result = resolveStringNull(value);
 			break;
 		case "timestamp":
-			result =  resolveStringNull(value);
+			result = resolveStringNull(value);
 			break;
 		case "bool":
 			result = resolveStringNull(value);
@@ -84,11 +88,11 @@ public class CSVReader {
 			System.out.println(metaData.toString());
 			assert true : "cannot find right type";
 		}
-		return result;
+		return PGAFileHelper.correctTheDelimeterInValue(result);
 	}
 
 	private String resolveStringNull(String value) {
-		return value != null && !value.equals("null") ? "'" +value+ "'" : null;
+		return value != null && !value.equals("null") ? "'" + value + "'" : null;
 	}
 
 	private String resolveNull(String value) {
