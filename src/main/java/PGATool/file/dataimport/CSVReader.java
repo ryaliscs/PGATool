@@ -21,20 +21,28 @@ import PGATool.file.PGAFileHelper;
 
 public class CSVReader {
 
-	public void readCSVFile(String tableName, Path path) throws IOException, SQLException {
-
-		List<String> insertStatements = getInsertStatements(tableName, path);
-		updateDataBase(tableName, insertStatements);
+	public void importData(List<String> tables) throws IOException, SQLException {
+		DBConnection dbcon = new DBConnection();
+		Map<String, Path> filePathsFromBackupSource = PGAFileHelper.getFilePathsFromBackupSource();
+		try (Connection conn = dbcon.connect(); Statement stmt = conn.createStatement();) {
+			for (String table : tables) {
+				System.out.println("Inserting into :" + table);
+				readCSVFile(stmt, table, filePathsFromBackupSource.get(table));
+			}
+		}
 	}
 
-	private void updateDataBase(String tableName, List<String> insertStatements) throws SQLException, IOException {
-		DBConnection dbcon = new DBConnection();
-		System.out.println("Inserting into :" + tableName);
-		try (Connection conn = dbcon.connect(); Statement stmt = conn.createStatement();) {
-			for (String insertStatement : insertStatements) {
+	private void readCSVFile(Statement stmt, String tableName, Path path) throws IOException, SQLException {
+
+		List<String> insertStatements = getInsertStatements(tableName, path);
+		updateDataBase(stmt, tableName, insertStatements);
+	}
+
+	private void updateDataBase(Statement stmt, String tableName, List<String> insertStatements)
+			throws SQLException, IOException {
+		for (String insertStatement : insertStatements) {
 //				System.out.println(insertStatement);
-				stmt.execute(insertStatement);
-			}
+			stmt.execute(insertStatement);
 		}
 	}
 
@@ -113,10 +121,4 @@ public class CSVReader {
 		return mapColumnType;
 	}
 
-	public void cleanup(String tableName) throws SQLException, IOException {
-		DBConnection dbcon = new DBConnection();
-		try (Connection conn = dbcon.connect(); Statement stmt = conn.createStatement();) {
-			stmt.execute("delete from " + tableName);
-		}
-	}
 }

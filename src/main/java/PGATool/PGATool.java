@@ -44,9 +44,7 @@ public class PGATool {
 
 	public void exportDATA() throws IOException, URISyntaxException, SQLException {
 		PGTableExporter exporter = new PGTableExporter();
-		for (String table : PGAProperties.getTables()) {
-			exporter.export(table);
-		}
+		exporter.export(PGAProperties.getTables());
 	}
 
 	private void importDATA() throws IOException, URISyntaxException, SQLException {
