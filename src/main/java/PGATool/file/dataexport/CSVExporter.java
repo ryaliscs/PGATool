@@ -11,11 +11,14 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.logging.Logger;
 
 import PGATool.connection.DBConnection;
 import PGATool.file.PGAFileHelper;
 
 public class CSVExporter {
+	
+	private final static Logger LOGGER = Logger.getLogger(CSVExporter.class.getName());
 
 	public void writeToFile(List<String> tables) throws IOException, SQLException {
 
@@ -27,7 +30,7 @@ public class CSVExporter {
 				// Writing data here
 				byte[] buf = getDataFromTable(stmt, tableName).getBytes();
 				Files.write(path, buf);
-				System.out.println("Export data of: " + tableName);
+				LOGGER.info("Export data of: " + tableName);
 			}
 		}
 	}
@@ -46,7 +49,7 @@ public class CSVExporter {
 			addData(sb, rs);
 			return sb.toString();
 		} catch (SQLException ex) {
-			System.out.println("Missing table :" + tableName);
+			LOGGER.severe("Missing table :" + tableName);
 			// ex.printStackTrace();
 		}
 		return "";
@@ -59,7 +62,7 @@ public class CSVExporter {
 			for (int i = 1; i <= columnCount; i++) {
 				String columnLabel = metaData.getColumnLabel(i);
 				String value = PGAFileHelper.replaceTheDelimeterInValue(rs.getString(columnLabel));
-				// System.out.println(columnLabel + "-" + value);
+				// LOGGER.info(columnLabel + "-" + value);
 				sb.append(value);
 				if (i != columnCount) {
 					sb.append(",");

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.google.common.io.Files;
 
@@ -20,13 +21,14 @@ import PGATool.connection.DBConnection;
 import PGATool.file.PGAFileHelper;
 
 public class CSVReader {
+	private final static Logger LOGGER = Logger.getLogger(CSVReader.class.getName());
 
 	public void importData(List<String> tables) throws IOException, SQLException {
 		DBConnection dbcon = new DBConnection();
 		Map<String, Path> filePathsFromBackupSource = PGAFileHelper.getFilePathsFromBackupSource();
 		try (Connection conn = dbcon.connect(); Statement stmt = conn.createStatement();) {
 			for (String table : tables) {
-				System.out.println("Inserting into :" + table);
+				LOGGER.info("Inserting into :" + table);
 				readCSVFile(stmt, table, filePathsFromBackupSource.get(table));
 			}
 		}
@@ -34,21 +36,22 @@ public class CSVReader {
 
 	private void readCSVFile(Statement stmt, String tableName, Path path) throws IOException, SQLException {
 
-		List<String> insertStatements = getInsertStatements(tableName, path);
+		List<String> insertStatements = getInsertStatements(stmt, tableName, path);
 		updateDataBase(stmt, tableName, insertStatements);
 	}
 
 	private void updateDataBase(Statement stmt, String tableName, List<String> insertStatements)
 			throws SQLException, IOException {
 		for (String insertStatement : insertStatements) {
-//				System.out.println(insertStatement);
+//				LOGGER.info(insertStatement);
 			stmt.execute(insertStatement);
 		}
 	}
 
-	private List<String> getInsertStatements(String tableName, Path path) throws SQLException, IOException {
+	private List<String> getInsertStatements(Statement stmt, String tableName, Path path)
+			throws SQLException, IOException {
 		List<String> insertStatements = new ArrayList<>();
-		Map<String, String> metaData = getMetaData(tableName);
+		Map<String, String> metaData = getMetaData(stmt, tableName);
 
 		List<String> readLines = Files.readLines(new File(path.toUri()), Charset.defaultCharset());
 		if (readLines.size() > 0) {
@@ -93,7 +96,7 @@ public class CSVReader {
 			result = resolveStringNull(value);
 			break;
 		default:
-			System.out.println(metaData.toString());
+			LOGGER.info(metaData.toString());
 			assert true : "cannot find right type";
 		}
 		return PGAFileHelper.correctTheDelimeterInValue(result);
@@ -107,12 +110,10 @@ public class CSVReader {
 		return value != null ? value : null;
 	}
 
-	private Map<String, String> getMetaData(String tableName) throws SQLException, IOException {
+	private Map<String, String> getMetaData(Statement stmt, String tableName) throws SQLException, IOException {
 		DBConnection dbcon = new DBConnection();
 		Map<String, String> mapColumnType = new HashMap<>();
-		try (Connection conn = dbcon.connect();
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery("select * from " + tableName)) {
+		try (ResultSet rs = stmt.executeQuery("select * from " + tableName)) {
 			ResultSetMetaData metaData = rs.getMetaData();
 			for (int i = 1; i <= metaData.getColumnCount(); i++) {
 				mapColumnType.put(metaData.getColumnName(i), metaData.getColumnTypeName(i));

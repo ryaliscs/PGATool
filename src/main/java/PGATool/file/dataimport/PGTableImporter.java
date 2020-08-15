@@ -6,18 +6,20 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.logging.Logger;
 
 import PGATool.connection.DBConnection;
 import PGATool.properties.PGAProperties;
 
 public class PGTableImporter {
+	private final static Logger LOGGER = Logger.getLogger(PGTableImporter.class.getName());
 
 	public void importData() throws IOException, URISyntaxException, SQLException {
 		CSVReader reader = new CSVReader();
 		List<String> tables = PGAProperties.getTables();
-		System.out.println("Started cleaning the database tables....");
+		LOGGER.info("Started cleaning the database tables....");
 		cleanup(tables);
-		System.out.println("Cleaning the database tables....Done");
+		LOGGER.info("Cleaning the database tables....Done");
 
 		reader.importData(tables);
 
