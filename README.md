@@ -1,2 +1,2 @@
 # PGATool
-PGA Tool to export and import data
+A Java Tool to export and import data from a Postgress Database.
