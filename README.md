@@ -2,42 +2,33 @@
 A Java Tool to export and import tables as .csv files from and to a Postgress Database.
 
 ## Execution Steps
+Takes (2) parameters
+
+(1) - EXPORT/IMPORT
+
+(2) - pga tool configuration file [<pgatool_properties>.properties]
+
 ### To export:
-Takes (3) parameters
-
-(1) - EXPORT
-
-(2) - Database configuration properties file
-
-(3) - properties file with List of tables to export
-
 ```
-java -jar PGATool EXPORT <database_properties>.properties <file_with_listoftables_to_export>.properties
+java -jar PGATool EXPORT <pgatool_properties>.properties 
 ```
 
 ### To import 
-Takes (4) parameters
-
-(1) - EXPORT
-
-(2) - Database configuration properties file
-
-(3) - Properties file with List of tables to export
-
-(4) - Path to read the .csv files
 
 ```
-java -jar PGATool IMPORT <database_properties>.properties <file_with_listoftables_to_export>.properties <path_to_store_the_backup>
+java -jar PGATool IMPORT <pgatool_properties>.properties
 ```
-### Example of <database_properties>.properties
-Datbase properties to be used for *exporting/importing* the tables
+### Example of  [<pgatool_properties>.properties]
+Configuration properties to be used for **EXPORT/IMPORT** the tables
 ```
 url=jdbc:postgresql://localhost:5432/<databasename>
 user=<username>
 password=<password>
+tables=<file_path_with_listoftables_to_export>.properties
+backupPath=<path_of_backup_location>
 ```
 
-### Example of <file_with_listoftables_to_export>.properties
+### Example of <file_path_with_listoftables_to_export>.properties
 The tables are imported and exported in the same order as they are mentioned in this file.
 ```
 table_1
