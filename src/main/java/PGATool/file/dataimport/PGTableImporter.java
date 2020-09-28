@@ -22,6 +22,8 @@ public class PGTableImporter {
 		LOGGER.info("Cleaning the database tables....Done");
 
 		reader.importData(tables);
+		
+		LOGGER.info("Importing of tables finished");
 
 	}
 

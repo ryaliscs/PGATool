@@ -1,5 +1,11 @@
 package PGATool.properties;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Properties;
+
 public final class AppProperties {
 
 	private static AppProperties APP_PROPERTIES;
@@ -8,28 +14,35 @@ public final class AppProperties {
 	private String backupFilesPath;
 
 	private AppProperties() {
-
 	}
 
-	public static AppProperties getInstance() {
+	public static AppProperties getInstance() throws FileNotFoundException, IOException {
 		if (APP_PROPERTIES == null) {
-			APP_PROPERTIES = new AppProperties();
+			APP_PROPERTIES = new AppProperties();			
 		}
 		return APP_PROPERTIES;
 	}
+
+	/**
+	 * init App properties
+	 * 
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public void init(String aPropertiesFilePath) throws FileNotFoundException, IOException {
+		this.dbPropertiesFilePath = aPropertiesFilePath;
+		Properties properties = new Properties();
+		properties.load(new FileInputStream(new File(this.dbPropertiesFilePath)));
+		this.tablesPropertiesFilePath = properties.getProperty("tables");
+		this.backupFilesPath = properties.getProperty("backupPath");
+	}
+	
 
 	/**
 	 * @return the dbPropertiesFilePath
 	 */
 	public String getDbPropertiesFilePath() {
 		return dbPropertiesFilePath;
-	}
-
-	/**
-	 * @param dbPropertiesFilePath the dbPropertiesFilePath to set
-	 */
-	public void setDbPropertiesFilePath(String dbPropertiesFilePath) {
-		this.dbPropertiesFilePath = dbPropertiesFilePath;
 	}
 
 	/**
@@ -40,24 +53,10 @@ public final class AppProperties {
 	}
 
 	/**
-	 * @param tablesPropertiesFilePath the tablesPropertiesFilePath to set
-	 */
-	public void setTablesPropertiesFilePath(String tablesPropertiesFilePath) {
-		this.tablesPropertiesFilePath = tablesPropertiesFilePath;
-	}
-
-	/**
 	 * @return the backupFilesPath
 	 */
 	public String getBackupFilesPath() {
 		return backupFilesPath;
-	}
-
-	/**
-	 * @param backupFilesPath the backupFilesPath to set
-	 */
-	public void setBackupFilesPath(String backupFilesPath) {
-		this.backupFilesPath = backupFilesPath;
 	}
 
 }

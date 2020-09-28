@@ -1,5 +1,6 @@
 package PGATool;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -24,18 +25,10 @@ public class PGATool {
 
 	}
 
-	private static void initApplication(String[] args) {
-		if (args.length == 3) {
-			IS_EXPORT = args[0].equalsIgnoreCase("EXPORT");
-			assert IS_EXPORT : "expected EXPORT";
-			AppProperties.getInstance().setDbPropertiesFilePath(args[1]);
-			AppProperties.getInstance().setTablesPropertiesFilePath(args[2]);
-		} else if (args.length == 4) {
-			IS_EXPORT = !args[0].equalsIgnoreCase("IMPORT");
-			assert !IS_EXPORT : "expected IMPORT";
-			AppProperties.getInstance().setDbPropertiesFilePath(args[1]);
-			AppProperties.getInstance().setTablesPropertiesFilePath(args[2]);
-			AppProperties.getInstance().setBackupFilesPath(args[3]);
+	private static void initApplication(String[] args) throws FileNotFoundException, IOException {
+		if (args.length == 2) {
+			IS_EXPORT = args[0].equalsIgnoreCase("EXPORT");			
+			AppProperties.getInstance().init(args[1]);
 		} else {
 			throw new IllegalArgumentException("expected arguments EXPORT dbpropertiespath tablepropertiespath \n"
 					+ "or \n IMPORT dbpropertiespath tablepropertiespath backuppath");

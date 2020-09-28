@@ -1,6 +1,7 @@
 package PGATool.file.dataexport;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,8 +36,8 @@ public class CSVExporter {
 		}
 	}
 
-	private String getExportFilePath(String tableName) {
-		File dmdBackup = PGAFileHelper.getDMDBackupPath();
+	private String getExportFilePath(String tableName) throws FileNotFoundException, IOException {
+		File dmdBackup = PGAFileHelper.getBackupPath();
 		String tableBackupPath = dmdBackup.toPath().toString() + "/" + tableName + ".csv";
 		PGAFileHelper.deleteFileIfExits(tableBackupPath);
 		return tableBackupPath;

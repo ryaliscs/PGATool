@@ -35,9 +35,10 @@ public class PGAProperties {
 
 	public static List<String> getTables() throws IOException, URISyntaxException {
 		List<String> tables = new ArrayList<String>();
-		Scanner sc = new Scanner(new File(AppProperties.getInstance().getTablesPropertiesFilePath()));
-		while (sc.hasNextLine()) {
-			tables.add(sc.nextLine());
+		try (Scanner sc = new Scanner(new File(AppProperties.getInstance().getTablesPropertiesFilePath()))) {
+			while (sc.hasNextLine()) {
+				tables.add(sc.nextLine());
+			}
 		}
 		return tables;
 	}

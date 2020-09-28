@@ -1,6 +1,7 @@
 package PGATool.file;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,10 +22,8 @@ public class PGAFileHelper {
 		}
 	}
 
-	public static File getDMDBackupPath() {
-		String property = "java.io.tmpdir";
-		String tempDir = System.getProperty(property);
-		File dmdBackup = new File(tempDir + "/dmdBackup");
+	public static File getBackupPath() throws FileNotFoundException, IOException {		
+		File dmdBackup = new File(AppProperties.getInstance().getBackupFilesPath());
 		dmdBackup.mkdir();
 		return dmdBackup;
 	}
