@@ -27,8 +27,11 @@ public class CSVReader {
 		DBConnection dbcon = new DBConnection();
 		Map<String, Path> filePathsFromBackupSource = PGAFileHelper.getFilePathsFromBackupSource();
 		try (Connection conn = dbcon.connect(); Statement stmt = conn.createStatement();) {
-			for (String table : tables) {
-				LOGGER.info("Inserting into :" + table);
+			LOGGER.info("Importing ("+tables.size()+") tables");
+			for (int i=0; i<tables.size();i++) {
+				String table = tables.get(i);
+				int j = i+1;
+				LOGGER.info("Inserting into :"+j +". " + table);
 				readCSVFile(stmt, table, filePathsFromBackupSource.get(table));
 			}
 		}
@@ -111,7 +114,6 @@ public class CSVReader {
 	}
 
 	private Map<String, String> getMetaData(Statement stmt, String tableName) throws SQLException, IOException {
-		DBConnection dbcon = new DBConnection();
 		Map<String, String> mapColumnType = new HashMap<>();
 		try (ResultSet rs = stmt.executeQuery("select * from " + tableName)) {
 			ResultSetMetaData metaData = rs.getMetaData();

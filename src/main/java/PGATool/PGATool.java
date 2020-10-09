@@ -30,8 +30,10 @@ public class PGATool {
 			IS_EXPORT = args[0].equalsIgnoreCase("EXPORT");			
 			AppProperties.getInstance().init(args[1]);
 		} else {
-			throw new IllegalArgumentException("expected arguments EXPORT dbpropertiespath tablepropertiespath \n"
-					+ "or \n IMPORT dbpropertiespath tablepropertiespath backuppath");
+			throw new IllegalArgumentException("\n************************************************************\n"
+					+ "expected arguments\n EXPORT propertiespath \n"
+					+ "or \n IMPORT propertiespath"
+					+ "\n************************************************************\n");
 		}
 	}
 
