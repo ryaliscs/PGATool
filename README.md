@@ -10,13 +10,13 @@ Takes (2) parameters
 
 ### To export:
 ```
-gradlew --args="EXPORT <pgatool_properties>.properties"
+gradlew run --args="EXPORT <pgatool_properties>.properties"
 ```
 
 ### To import 
 
 ```
-gradlew --args="IMPORT <pgatool_properties>.properties"
+gradlew run --args="IMPORT <pgatool_properties>.properties"
 ```
 ### Example of  [<pgatool_properties>.properties]
 Configuration properties to be used for **EXPORT/IMPORT** the tables
