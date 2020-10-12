@@ -13,7 +13,7 @@ plugins {
 }
 
 ext {
-	// gradlew run --args="IMPORT pgtool.properties"
+	// gradlew run --args="IMPORT/EXPORT pgtool.properties"
    javaMainClass = "PGATool.PGATool"
 }
 
@@ -28,9 +28,11 @@ jar {
         attributes "Main-Class": "PGATool.PGATool"
     }
  
-    from {
+   /** 
+   to include runtime dependencies in the main jar
+   from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
+    }**/
 }
 
 application {
@@ -57,3 +59,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 }
 
+// to trigger coping of dpeendencies when build is triggered
+build.finalizedBy('copyDependencies')
+
+
+defaultTasks 'clean', 'run'
