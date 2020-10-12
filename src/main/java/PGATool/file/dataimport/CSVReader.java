@@ -22,6 +22,7 @@ import PGATool.file.PGAFileHelper;
 
 public class CSVReader {
 	private final static Logger LOGGER = Logger.getLogger(CSVReader.class.getName());
+	private int total_rows_count = 0;
 
 	public void importData(List<String> tables) throws IOException, SQLException {
 		DBConnection dbcon = new DBConnection();
@@ -35,12 +36,16 @@ public class CSVReader {
 				readCSVFile(stmt, table, filePathsFromBackupSource.get(table));
 			}
 		}
+		LOGGER.info("Total No. of records inserted in database ("+ this.total_rows_count+")");
 	}
 
 	private void readCSVFile(Statement stmt, String tableName, Path path) throws IOException, SQLException {
 
 		List<String> insertStatements = getInsertStatements(stmt, tableName, path);
 		updateDataBase(stmt, tableName, insertStatements);
+		int rowsInTable = insertStatements.size();
+		total_rows_count+=rowsInTable;
+		LOGGER.info("No. of records inserted "+tableName+" ("+ rowsInTable+")");
 	}
 
 	private void updateDataBase(Statement stmt, String tableName, List<String> insertStatements)

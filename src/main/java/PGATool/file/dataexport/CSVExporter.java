@@ -18,22 +18,26 @@ import PGATool.connection.DBConnection;
 import PGATool.file.PGAFileHelper;
 
 public class CSVExporter {
-	
+
 	private final static Logger LOGGER = Logger.getLogger(CSVExporter.class.getName());
+	int total_rows_exported = 0;
 
 	public void writeToFile(List<String> tables) throws IOException, SQLException {
 
 		DBConnection con = new DBConnection();
 		try (Connection conn = con.connect(); Statement stmt = conn.createStatement();) {
 			for (String tableName : tables) {
+				LOGGER.info("Exporting data from: " + tableName);
 				String tableBackupPath = getExportFilePath(tableName);
 				Path path = Files.createFile(Paths.get(tableBackupPath));
 				// Writing data here
 				byte[] buf = getDataFromTable(stmt, tableName).getBytes();
 				Files.write(path, buf);
-				LOGGER.info("Export data of: " + tableName);
+				LOGGER.info("Exported data of: " + tableName);
 			}
 		}
+
+		LOGGER.info("Total number of records exported in database (" + this.total_rows_exported + ")");
 	}
 
 	private String getExportFilePath(String tableName) throws FileNotFoundException, IOException {
@@ -58,7 +62,9 @@ public class CSVExporter {
 
 	private void addData(StringBuilder sb, ResultSet rs) throws SQLException {
 		ResultSetMetaData metaData = rs.getMetaData();
+		int rowCount = 0;
 		while (rs.next()) {
+			rowCount++;
 			int columnCount = metaData.getColumnCount();
 			for (int i = 1; i <= columnCount; i++) {
 				String columnLabel = metaData.getColumnLabel(i);
@@ -71,6 +77,8 @@ public class CSVExporter {
 			}
 			sb.append("\n");
 		}
+		this.total_rows_exported += rowCount;
+		LOGGER.info("Total number of records exported (" + rowCount+")");
 	}
 
 	private void prepareHeader(StringBuilder sb, ResultSetMetaData metaData) throws SQLException {
