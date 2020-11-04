@@ -1,14 +1,14 @@
-package PGATool;
+package pgatool;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 
-import PGATool.file.dataexport.PGTableExporter;
-import PGATool.file.dataimport.PGTableImporter;
-import PGATool.properties.AppProperties;
-import PGATool.properties.PGAProperties;
+import pgatool.file.dataexport.PGTableExporter;
+import pgatool.file.dataimport.PGTableImporter;
+import pgatool.properties.AppProperties;
+import pgatool.properties.PGAProperties;
 
 public class PGATool {
 	public static boolean IS_EXPORT = true;

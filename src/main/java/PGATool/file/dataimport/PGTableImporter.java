@@ -1,4 +1,4 @@
-package PGATool.file.dataimport;
+package pgatool.file.dataimport;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -8,8 +8,8 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.logging.Logger;
 
-import PGATool.connection.DBConnection;
-import PGATool.properties.PGAProperties;
+import pgatool.connection.DBConnection;
+import pgatool.properties.PGAProperties;
 
 public class PGTableImporter {
 	private final static Logger LOGGER = Logger.getLogger(PGTableImporter.class.getName());

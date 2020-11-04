@@ -1,4 +1,4 @@
-package PGATool.properties;
+package pgatool.properties;
 
 import java.io.File;
 import java.io.FileInputStream;

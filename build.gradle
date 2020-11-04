@@ -14,7 +14,7 @@ plugins {
 
 ext {
 	// gradlew run --args="IMPORT/EXPORT pgtool.properties"
-   javaMainClass = "PGATool.PGATool"
+   javaMainClass = "pgatool.PGATool"
 }
 
 repositories {

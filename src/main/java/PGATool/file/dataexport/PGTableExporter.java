@@ -1,4 +1,4 @@
-package PGATool.file.dataexport;
+package pgatool.file.dataexport;
 
 import java.io.IOException;
 import java.sql.SQLException;

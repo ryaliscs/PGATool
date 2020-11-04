@@ -1,4 +1,4 @@
-package PGATool.file;
+package pgatool.file;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import PGATool.properties.AppProperties;
+import pgatool.properties.AppProperties;
 
 public class PGAFileHelper {
 	public static void deleteFileIfExits(String tableBackupPath) {

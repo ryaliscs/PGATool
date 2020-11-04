@@ -1,4 +1,4 @@
-package PGATool.file.dataimport;
+package pgatool.file.dataimport;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,8 +17,8 @@ import java.util.logging.Logger;
 
 import com.google.common.io.Files;
 
-import PGATool.connection.DBConnection;
-import PGATool.file.PGAFileHelper;
+import pgatool.connection.DBConnection;
+import pgatool.file.PGAFileHelper;
 
 public class CSVReader {
 	private final static Logger LOGGER = Logger.getLogger(CSVReader.class.getName());

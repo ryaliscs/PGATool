@@ -1,13 +1,12 @@
-package PGATool.connection;
+package pgatool.connection;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.logging.Logger;
-
-import PGATool.properties.DBProperties;
-import PGATool.properties.PGAProperties;
+import pgatool.logger.PGALogger;
+import pgatool.properties.DBProperties;
+import pgatool.properties.PGAProperties;
 
 /**
  * Class to establish the Database connection with the given
@@ -17,7 +16,6 @@ import PGATool.properties.PGAProperties;
  *
  */
 public final class DBConnection {
-	private final static Logger LOGGER = Logger.getLogger(DBConnection.class.getName());
 
 	/**
 	 * Returns the DB connection
@@ -28,12 +26,15 @@ public final class DBConnection {
 	 */
 	public Connection connect() throws SQLException, IOException {
 		DBProperties dbProperties = PGAProperties.getDBProperties();
-		LOGGER.info("---------------------------------------------\n" + //
-				"Connect to Data Base:\n" + //
-				"URL:" + dbProperties.getUrl() + "\n" + //
+		String urlString = dbProperties.getUrl();
+		int endIndex = urlString.contains("?") ? urlString.indexOf('?') : urlString.length();
+		String dbName = urlString.substring(urlString.lastIndexOf('/') + 1, endIndex);
+		PGALogger.getLogger().info("---------------------------------------------\n" + //
+				"Connected to Data Base:\n" + //
+				"Name :" + dbName + "\n" + //
 				"User Name:" + dbProperties.getUser() + "\n" + //
 				"---------------------------------------------");
-		return DriverManager.getConnection(dbProperties.getUrl(), //
+		return DriverManager.getConnection(urlString, //
 				dbProperties.getUser(), dbProperties.getPassword());
 	}
 

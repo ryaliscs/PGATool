@@ -1,4 +1,4 @@
-package PGATool.properties;
+package pgatool.properties;
 
 public class DBProperties {
 	private final String url;
