@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 
 import pgatool.connection.DBConnection;
@@ -23,13 +24,15 @@ public class CSVExporter {
 
 	int total_rows_exported = 0;
 	Instant tableStartTime;
+	int recordCount=0;
 
 	public void writeToFile(List<String> tables) throws IOException, SQLException {
-		PGALogger.getLogger().info("Started exporting ( " + tables.size() + " ) tables");
 
 		Instant start = Instant.now();
 		DBConnection con = new DBConnection();
 		try (Connection conn = con.connect(); Statement stmt = conn.createStatement();) {
+			PGALogger.getLogger().info("Started exporting (" + tables.size() + ") tables");
+			PGALogger.logSeparator();
 			for (String tableName : tables) {
 				tableStartTime = Instant.now();
 				String tableBackupPath = getExportFilePath(tableName);
@@ -41,11 +44,11 @@ public class CSVExporter {
 		}
 		Instant finish = Instant.now();
 		long totalTime = Duration.between(start, finish).toMillis();
-		PGALogger.getLogger().info("---------------------------------------------------------------------------");
+		PGALogger.logSeparator();
 		PGALogger.getLogger().info("Total Number of Tables exported " + tables.size());
 		PGALogger.getLogger().info("Total number of records exported in database (" + this.total_rows_exported + ")");
-		PGALogger.getLogger().info("Exported in ( " + totalTime + " ) ms");
-		PGALogger.getLogger().info("---------------------------------------------------------------------------");
+		PGALogger.getLogger().info("Exported in " + totalTime + " ms, Start Time:"+ Date.from(start) + ", End Time:" + Date.from(finish));
+		PGALogger.logSeparator();
 	}
 
 	private String getExportFilePath(String tableName) throws FileNotFoundException, IOException {
@@ -62,7 +65,7 @@ public class CSVExporter {
 			addData(sb, rs);
 			return sb.toString();
 		} catch (SQLException ex) {
-			PGALogger.getLogger().severe("Missing table :" + tableName);
+			PGALogger.getLogger().severe("* Missing table :" + tableName);
 			// ex.printStackTrace();
 		}
 		return "";
@@ -86,10 +89,8 @@ public class CSVExporter {
 			sb.append("\n");
 		}
 		this.total_rows_exported += rowCount;
-		Instant finish = Instant.now();
-		long totalTime = Duration.between(tableStartTime, finish).toMillis();
-		PGALogger.getLogger().info(
-				"Exported " + metaData.getTableName(1) + " with (" + rowCount + ") records in (" + totalTime + ") ms");
+		Instant finish = Instant.now();		
+		PGALogger.logExport(++recordCount, metaData.getTableName(1), rowCount, tableStartTime, finish);
 	}
 
 	private void prepareHeader(StringBuilder sb, ResultSetMetaData metaData) throws SQLException {

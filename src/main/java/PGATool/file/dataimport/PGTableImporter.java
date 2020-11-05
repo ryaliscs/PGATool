@@ -22,14 +22,14 @@ public class PGTableImporter {
 		LOGGER.info("Cleaning the database tables....Done");
 
 		reader.importData(tables);
-		
+
 		LOGGER.info("Importing of tables finished");
 
 	}
 
 	private void cleanup(List<String> tables) throws SQLException, IOException {
 		DBConnection dbcon = new DBConnection();
-		try (Connection conn = dbcon.connect(); Statement stmt = conn.createStatement();) {
+		try (Connection conn = dbcon.connect(false/* logger disabled */); Statement stmt = conn.createStatement();) {
 			for (int i = tables.size() - 1; i >= 0; i--) {
 				stmt.execute("delete from " + tables.get(i));
 			}

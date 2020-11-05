@@ -9,34 +9,46 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
-
 import com.google.common.io.Files;
 
 import pgatool.connection.DBConnection;
 import pgatool.file.PGAFileHelper;
+import pgatool.logger.PGALogger;
 
 public class CSVReader {
-	private final static Logger LOGGER = Logger.getLogger(CSVReader.class.getName());
 	private int total_rows_count = 0;
+	Instant tableStartTime;
+	int recordCount=0;
 
 	public void importData(List<String> tables) throws IOException, SQLException {
+		Instant start = Instant.now();
 		DBConnection dbcon = new DBConnection();
 		Map<String, Path> filePathsFromBackupSource = PGAFileHelper.getFilePathsFromBackupSource();
 		try (Connection conn = dbcon.connect(); Statement stmt = conn.createStatement();) {
-			LOGGER.info("Importing ("+tables.size()+") tables");
-			for (int i=0; i<tables.size();i++) {
-				String table = tables.get(i);
-				int j = i+1;
-				LOGGER.info("Inserting into :"+j +". " + table);
+			PGALogger.getLogger().info("Started Importing (" + tables.size() + ") tables");
+			PGALogger.logSeparator();
+			
+			for (int i = 0; i < tables.size(); i++) {
+				tableStartTime = Instant.now();
+				String table = tables.get(i);				
 				readCSVFile(stmt, table, filePathsFromBackupSource.get(table));
 			}
 		}
-		LOGGER.info("Total No. of records inserted in database ("+ this.total_rows_count+")");
+
+		Instant finish = Instant.now();
+		long totalTime = Duration.between(start, finish).toMillis();
+		PGALogger.logSeparator();
+		PGALogger.getLogger().info("Total Number of Tables imported " + tables.size());
+		PGALogger.getLogger().info("Total number of records imported in database (" + this.total_rows_count + ")");
+		PGALogger.getLogger().info("Imported in " + totalTime + " ms, Start Time:"+ Date.from(start) + ", End Time:" + Date.from(finish));
+		PGALogger.logSeparator();
 	}
 
 	private void readCSVFile(Statement stmt, String tableName, Path path) throws IOException, SQLException {
@@ -44,8 +56,9 @@ public class CSVReader {
 		List<String> insertStatements = getInsertStatements(stmt, tableName, path);
 		updateDataBase(stmt, tableName, insertStatements);
 		int rowsInTable = insertStatements.size();
-		total_rows_count+=rowsInTable;
-		LOGGER.info("No. of records inserted "+tableName+" ("+ rowsInTable+")");
+		total_rows_count += rowsInTable;
+		Instant finish = Instant.now();			
+		PGALogger.logImport(++recordCount, tableName, rowsInTable, tableStartTime, finish);
 	}
 
 	private void updateDataBase(Statement stmt, String tableName, List<String> insertStatements)
@@ -85,7 +98,7 @@ public class CSVReader {
 		return insertStatements;
 	}
 
-	private String getActualValue(String value, String headerColumn, Map<String, String> metaData) {
+	private String getActualValue(String value, String headerColumn, Map<String, String> metaData) throws IOException {
 		String result = "";
 		switch (metaData.get(headerColumn)) {
 		case "int8":
@@ -104,7 +117,7 @@ public class CSVReader {
 			result = resolveStringNull(value);
 			break;
 		default:
-			LOGGER.info(metaData.toString());
+			PGALogger.getLogger().info(metaData.toString());
 			assert true : "cannot find right type";
 		}
 		return PGAFileHelper.correctTheDelimeterInValue(result);

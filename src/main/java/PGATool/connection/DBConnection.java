@@ -25,15 +25,28 @@ public final class DBConnection {
 	 * @throws IOException
 	 */
 	public Connection connect() throws SQLException, IOException {
+		return connect(true);
+	}
+
+	/**
+	 * Returns the DB connection
+	 * 
+	 * @return
+	 * @throws SQLException
+	 * @throws IOException
+	 */
+	public Connection connect(boolean aLogInfo) throws SQLException, IOException {
 		DBProperties dbProperties = PGAProperties.getDBProperties();
 		String urlString = dbProperties.getUrl();
-		int endIndex = urlString.contains("?") ? urlString.indexOf('?') : urlString.length();
-		String dbName = urlString.substring(urlString.lastIndexOf('/') + 1, endIndex);
-		PGALogger.getLogger().info("---------------------------------------------\n" + //
-				"Connected to Data Base:\n" + //
-				"Name :" + dbName + "\n" + //
-				"User Name:" + dbProperties.getUser() + "\n" + //
-				"---------------------------------------------");
+		if (aLogInfo) {
+			int endIndex = urlString.contains("?") ? urlString.indexOf('?') : urlString.length();
+			String dbName = urlString.substring(urlString.lastIndexOf('/') + 1, endIndex);
+			PGALogger.logSeparator();
+			PGALogger.getLogger().info("Connected to Data Base:\n" + //
+					"Name :" + dbName + "\n" + //
+					"User Name:" + dbProperties.getUser());
+			PGALogger.logSeparator();
+		}
 		return DriverManager.getConnection(urlString, //
 				dbProperties.getUser(), dbProperties.getPassword());
 	}
