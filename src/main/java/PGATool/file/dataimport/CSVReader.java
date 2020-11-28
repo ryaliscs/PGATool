@@ -16,6 +16,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.postgresql.util.PSQLException;
+
 import com.google.common.io.Files;
 
 import pgatool.connection.DBConnection;
@@ -25,7 +28,7 @@ import pgatool.logger.PGALogger;
 public class CSVReader {
 	private int total_rows_count = 0;
 	Instant tableStartTime;
-	int recordCount=0;
+	int recordCount = 0;
 
 	public void importData(List<String> tables) throws IOException, SQLException {
 		Instant start = Instant.now();
@@ -34,10 +37,10 @@ public class CSVReader {
 		try (Connection conn = dbcon.connect(); Statement stmt = conn.createStatement();) {
 			PGALogger.getLogger().info("Started Importing (" + tables.size() + ") tables");
 			PGALogger.logSeparator();
-			
+
 			for (int i = 0; i < tables.size(); i++) {
 				tableStartTime = Instant.now();
-				String table = tables.get(i);				
+				String table = tables.get(i);
 				readCSVFile(stmt, table, filePathsFromBackupSource.get(table));
 			}
 		}
@@ -47,7 +50,8 @@ public class CSVReader {
 		PGALogger.logSeparator();
 		PGALogger.getLogger().info("Total Number of Tables imported " + tables.size());
 		PGALogger.getLogger().info("Total number of records imported in database (" + this.total_rows_count + ")");
-		PGALogger.getLogger().info("Imported in " + totalTime + " ms, Start Time:"+ Date.from(start) + ", End Time:" + Date.from(finish));
+		PGALogger.getLogger().info(
+				"Imported in " + totalTime + " ms, Start Time:" + Date.from(start) + ", End Time:" + Date.from(finish));
 		PGALogger.logSeparator();
 	}
 
@@ -57,7 +61,7 @@ public class CSVReader {
 		updateDataBase(stmt, tableName, insertStatements);
 		int rowsInTable = insertStatements.size();
 		total_rows_count += rowsInTable;
-		Instant finish = Instant.now();			
+		Instant finish = Instant.now();
 		PGALogger.logImport(++recordCount, tableName, rowsInTable, tableStartTime, finish);
 	}
 
@@ -138,6 +142,8 @@ public class CSVReader {
 			for (int i = 1; i <= metaData.getColumnCount(); i++) {
 				mapColumnType.put(metaData.getColumnName(i), metaData.getColumnTypeName(i));
 			}
+		}catch (SQLException ex) {
+			PGALogger.getLogger().info("cannot find table "+tableName);
 		}
 		return mapColumnType;
 	}

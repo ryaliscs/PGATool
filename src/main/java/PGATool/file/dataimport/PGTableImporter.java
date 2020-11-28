@@ -31,7 +31,12 @@ public class PGTableImporter {
 		DBConnection dbcon = new DBConnection();
 		try (Connection conn = dbcon.connect(false/* logger disabled */); Statement stmt = conn.createStatement();) {
 			for (int i = tables.size() - 1; i >= 0; i--) {
-				stmt.execute("delete from " + tables.get(i));
+				try {
+					stmt.execute("delete from " + tables.get(i));
+				} catch (Exception ex) {
+					LOGGER.info("cannot find table " + tables.get(i));
+
+				}
 			}
 		}
 	}
